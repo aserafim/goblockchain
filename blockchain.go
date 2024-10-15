@@ -23,6 +23,13 @@ func (bc *Blockchain) CreateBlock(nonce int, previousHash string) *Block {
 	return b
 }
 
+func (bc *Blockchain) Print() {
+	for i, block := range bc.chain {
+		fmt.Printf("Chain %d \n", i)
+		block.Print()
+	}
+}
+
 type Block struct {
 	nonce        int
 	previousHash string
@@ -52,6 +59,7 @@ func init() {
 }
 
 func main() {
-	b := NewBlock(0, "empty")
-	b.Print()
+	bc := NewBlockChain()
+	bc.CreateBlock(2, "init hash")
+	bc.Print()
 }
