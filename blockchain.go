@@ -10,11 +10,13 @@ import (
 )
 
 type Block struct {
+	timestamp    int64
 	nonce        int
 	previousHash [32]byte
-	timestamp    int64
 	transactions []*Transaction
 }
+
+const MINING_DIFFICULTY = 3
 
 func NewBlock(nonce int, previousHash [32]byte, transactions []*Transaction) *Block {
 	b := new(Block)
@@ -93,6 +95,35 @@ func (bc *Blockchain) AddTransaction(sender string, recipient string, value floa
 	bc.transactionPool = append(bc.transactionPool, t)
 }
 
+func (bc *Blockchain) CopyTransactionPool() []*Transaction {
+	transactions := make([]*Transaction, 0)
+	for _, t := range bc.transactionPool {
+		transactions = append(transactions,
+			NewTransaction(t.senderBlockChainAddress,
+				t.recipientBlockChainAddress,
+				t.value))
+	}
+	return transactions
+}
+
+func (bc *Blockchain) ValidProof(nonce int, previousHash [32]byte, transactions []*Transaction, difficulty int) bool {
+	zeros := strings.Repeat("0", difficulty)
+	guessBlock := Block{0, nonce, previousHash, transactions}
+	guessHashStr := fmt.Sprintf("%x", guessBlock.Hash())
+	return guessHashStr[:difficulty] == zeros
+}
+
+func (bc *Blockchain) ProofOfWork() int {
+	transactions := bc.CopyTransactionPool()
+	previousHash := bc.LastBlock().Hash()
+	nonce := 0
+	for !bc.ValidProof(nonce, previousHash, transactions, MINING_DIFFICULTY) {
+		nonce += 1
+	}
+
+	return nonce
+}
+
 type Transaction struct {
 	senderBlockChainAddress    string
 	recipientBlockChainAddress string
@@ -133,16 +164,19 @@ func main() {
 
 	bc.AddTransaction("A", "B", 1.0)
 	prevHash := bc.LastBlock().Hash()
-	bc.CreateBlock(5, prevHash)
+	nonce := bc.ProofOfWork()
+	bc.CreateBlock(nonce, prevHash)
 
 	bc.AddTransaction("C", "D", 3.0)
 	bc.AddTransaction("C", "E", 1.0)
 	prevHash = bc.LastBlock().Hash()
-	bc.CreateBlock(7, prevHash)
+	nonce = bc.ProofOfWork()
+	bc.CreateBlock(nonce, prevHash)
 
 	bc.AddTransaction("E", "W", 0.5)
 	prevHash = bc.LastBlock().Hash()
-	bc.CreateBlock(8, prevHash)
+	nonce = bc.ProofOfWork()
+	bc.CreateBlock(nonce, prevHash)
 	bc.Print()
 
 }
