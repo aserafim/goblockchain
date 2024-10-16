@@ -18,4 +18,5 @@ func main() {
 
 	t := wallet.NewTransaction(w.PrivateKey(), w.PublicKey(), w.BlockChainAddress(), "B", 1.0)
 	fmt.Printf("signature %s\n", t.GenerateSignature())
+
 }
