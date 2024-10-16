@@ -1,4 +1,4 @@
-package main
+package block
 
 import (
 	"crypto/sha256"
@@ -185,45 +185,4 @@ func (t *Transaction) MarshalJSON() ([]byte, error) {
 			RecipientBlockChainAddress: t.recipientBlockChainAddress,
 			Value:                      t.value,
 		})
-}
-
-func init() {
-	log.SetPrefix("Blockchain: ")
-}
-
-func main() {
-	myBlockchainAddress := "my_blockchain_address"
-	bc := NewBlockChain(myBlockchainAddress)
-	bc.Print()
-
-	bc.AddTransaction("A", "B", 1.0)
-	bc.Mining()
-	bc.Print()
-
-	bc.AddTransaction("C", "D", 3.0)
-	bc.AddTransaction("C", "E", 1.0)
-	bc.Mining()
-	bc.Print()
-
-	fmt.Printf("C %.1f\n", bc.CalculateTotalAmount("C"))
-	fmt.Printf("D %.1f\n", bc.CalculateTotalAmount("D"))
-	fmt.Printf("A %.1f\n", bc.CalculateTotalAmount("A"))
-	fmt.Printf("B %.1f\n", bc.CalculateTotalAmount("B"))
-
-	/* prevHash := bc.LastBlock().Hash()
-	nonce := bc.ProofOfWork()
-	bc.CreateBlock(nonce, prevHash)
-
-	bc.AddTransaction("C", "D", 3.0)
-	bc.AddTransaction("C", "E", 1.0)
-	prevHash = bc.LastBlock().Hash()
-	nonce = bc.ProofOfWork()
-	bc.CreateBlock(nonce, prevHash)
-
-	bc.AddTransaction("E", "W", 0.5)
-	prevHash = bc.LastBlock().Hash()
-	nonce = bc.ProofOfWork()
-	bc.CreateBlock(nonce, prevHash)
-	bc.Print() */
-
 }
