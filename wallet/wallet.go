@@ -7,8 +7,9 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"github.com/btcsuite/btcutil/base58"
 	"goblockchain/utils"
+
+	"github.com/btcsuite/btcutil/base58"
 	"golang.org/x/crypto/ripemd160"
 )
 
@@ -75,6 +76,19 @@ func (w *Wallet) PublicKeyStr() string {
 
 func (w *Wallet) BlockchainAddress() string {
 	return w.blockchainAddress
+}
+
+func (w *Wallet) MarshalJSON() ([]byte, error) {
+	return json.Marshal(
+		struct {
+			PrivateKey        string `json:"private_key"`
+			PublicKey         string `json:"public_key"`
+			BlockchainAddress string `json:"blockchain_address"`
+		}{
+			PrivateKey:        w.PrivateKeyStr(),
+			PublicKey:         w.PublicKeyStr(),
+			BlockchainAddress: w.BlockchainAddress(),
+		})
 }
 
 type Transaction struct {
